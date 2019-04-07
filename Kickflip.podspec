@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
 
   s.license      = 'Apache License, Version 2.0'
 
-  s.author       = { "Chris Ballinger" => "chris@openwatch.net" }
+  s.author       = { "Sos Avetyan" => "avetyansos@yahoo.com" }
   s.platform     = :ios, '7.0'
   s.source       = { :git => "https://github.com/Kickflip/kickflip-ios-sdk.git", :tag => s.version.to_s }
 
@@ -27,4 +27,6 @@ Pod::Spec.new do |s|
   s.dependency 'Mantle', '~> 1.4'
   s.dependency 'SDWebImage', '~> 3.6'
   s.dependency 'FormatterKit/TimeIntervalFormatter', '~> 1.4'
+  s.dependency 'Alamofire'
+  
 end

@@ -102,7 +102,6 @@
 				75F8E508B2F29164A2CF0829 /* Pods-Kickflip.debug.xcconfig */,
 				2D55736916520227774F26AB /* Pods-Kickflip.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -197,7 +196,7 @@
 				ORGANIZATIONNAME = Kickflip;
 				TargetAttributes = {
 					D945ADA2189853A80026F697 = {
-						DevelopmentTeam = 4T8JLQR6GR;
+						DevelopmentTeam = 882Y7347Y5;
 					};
 				};
 			};
@@ -206,6 +205,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = D99912C218984D3F00BFCBA4;
@@ -394,6 +394,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = 882Y7347Y5;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -406,7 +407,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Example/Kickflip-Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = "io.kickflip.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = io.hls;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -422,6 +423,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = 882Y7347Y5;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -430,7 +432,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Example/Kickflip-Prefix.pch";
 				INFOPLIST_FILE = "Example/Kickflip-Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = "io.kickflip.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = io.hls;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				TARGETED_DEVICE_FAMILY = "1,2";
