@@ -24,13 +24,15 @@
 @property (nonatomic) double minBitrate;
 @property (nonatomic) BOOL hasScreenshot;
 @property (nonatomic, strong) CLLocationManager *locationManager;
+@property (strong, nonatomic) NSString *endpointString;
 @end
 
 @implementation KFRecorder
 
-- (id) init {
+- (id) init:(NSString*)endPoint {
     if (self = [super init]) {
         _minBitrate = 300 * 1000;
+        self.endpointString = endPoint;
         [self setupSession];
         [self setupEncoders];
     }
@@ -46,17 +48,17 @@
     return nil;
 }
 
-- (void) setupHLSWriterWithEndpoint:(KFS3Stream*)endpoint {
+- (void) setupHLSWriterWithEndpoint:(NSString*)endpoint {
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
-    NSString *folderName = [NSString stringWithFormat:@"%@.hls", endpoint.streamID];
+    NSString *folderName = [NSString stringWithFormat:@"%@.hls", endpoint];
     NSString *hlsDirectoryPath = [basePath stringByAppendingPathComponent:folderName];
     [[NSFileManager defaultManager] createDirectoryAtPath:hlsDirectoryPath withIntermediateDirectories:YES attributes:nil error:nil];
     self.hlsWriter = [[KFHLSWriter alloc] initWithDirectoryPath:hlsDirectoryPath];
-    [_hlsWriter addVideoStreamWithWidth:self.videoWidth height:self.videoHeight];
-    [_hlsWriter addAudioStreamWithSampleRate:self.audioSampleRate];
-
+    [_hlsWriter addVideoStreamWithWidth:(int)self.videoWidth height:(int)self.videoHeight];
+    [_hlsWriter addAudioStreamWithSampleRate:(int)self.audioSampleRate];
+    
 }
 
 - (void) setupEncoders {
@@ -66,21 +68,14 @@
     int audioBitrate = 64 * 1000; // 64 Kbps
     int maxBitrate = [Kickflip maxBitrate];
     int videoBitrate = maxBitrate - audioBitrate;
-    _h264Encoder = [[KFH264Encoder alloc] initWithBitrate:videoBitrate width:self.videoWidth height:self.videoHeight];
+    _h264Encoder = [[KFH264Encoder alloc] initWithBitrate:videoBitrate width:(int)self.videoWidth height:(int)self.videoHeight];
     _h264Encoder.delegate = self;
-    
     _aacEncoder = [[KFAACEncoder alloc] initWithBitrate:audioBitrate sampleRate:self.audioSampleRate channels:1];
     _aacEncoder.delegate = self;
     _aacEncoder.addADTSHeader = YES;
 }
 
 - (void) setupAudioCapture {
-
-    // create capture device with video input
-    
-    /*
-     * Create audio connection
-     */
     AVCaptureDevice *audioDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio];
     NSError *error = nil;
     AVCaptureDeviceInput *audioInput = [[AVCaptureDeviceInput alloc] initWithDevice:audioDevice error:&error];
@@ -91,12 +86,12 @@
         [_session addInput:audioInput];
     }
     
-    _audioQueue = dispatch_queue_create("Audio Capture Queue", DISPATCH_QUEUE_SERIAL);
-    _audioOutput = [[AVCaptureAudioDataOutput alloc] init];
-    [_audioOutput setSampleBufferDelegate:self queue:_audioQueue];
-    if ([_session canAddOutput:_audioOutput]) {
-        [_session addOutput:_audioOutput];
-    }
+    //    _audioQueue = dispatch_queue_create("Audio Capture Queue", DISPATCH_QUEUE_SERIAL);
+    //    _audioOutput = [[AVCaptureAudioDataOutput alloc] init];
+    //    [_audioOutput setSampleBufferDelegate:self queue:_audioQueue];
+    //    if ([_session canAddOutput:_audioOutput]) {
+    //        [_session addOutput:_audioOutput];
+    //    }
     _audioConnection = [_audioOutput connectionWithMediaType:AVMediaTypeAudio];
 }
 
@@ -111,10 +106,10 @@
         [_session addInput:videoInput];
     }
     
-    // create an output for YUV output with self as delegate
-    _videoQueue = dispatch_queue_create("Video Capture Queue", DISPATCH_QUEUE_SERIAL);
-    _videoOutput = [[AVCaptureVideoDataOutput alloc] init];
-    [_videoOutput setSampleBufferDelegate:self queue:_videoQueue];
+    //    // create an output for YUV output with self as delegate
+    //    _videoQueue = dispatch_queue_create("Video Capture Queue", DISPATCH_QUEUE_SERIAL);
+    //    _videoOutput = [[AVCaptureVideoDataOutput alloc] init];
+    //    [_videoOutput setSampleBufferDelegate:self queue:_videoQueue];
     NSDictionary *captureSettings = @{(NSString*)kCVPixelBufferPixelFormatTypeKey: @(kCVPixelFormatType_32BGRA)};
     _videoOutput.videoSettings = captureSettings;
     _videoOutput.alwaysDiscardsLateVideoFrames = YES;
@@ -134,26 +129,26 @@
     }
 }
 
-#pragma mark AVCaptureOutputDelegate method
-- (void) captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
-{
-    if (!_isRecording) {
-        return;
-    }
-    // pass frame to encoders
-    if (connection == _videoConnection) {
-        if (!_hasScreenshot) {
-            UIImage *image = [self imageFromSampleBuffer:sampleBuffer];
-            NSString *path = [self.hlsWriter.directoryPath stringByAppendingPathComponent:@"thumb.jpg"];
-            NSData *imageData = UIImageJPEGRepresentation(image, 0.7);
-            [imageData writeToFile:path atomically:NO];
-            _hasScreenshot = YES;
-        }
-        [_h264Encoder encodeSampleBuffer:sampleBuffer];
-    } else if (connection == _audioConnection) {
-        [_aacEncoder encodeSampleBuffer:sampleBuffer];
-    }
-}
+//#pragma mark AVCaptureOutputDelegate method
+//- (void) captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
+//{
+//    if (!_isRecording) {
+//        return;
+//    }
+//    // pass frame to encoders
+//    if (connection == _videoConnection) {
+//        if (!_hasScreenshot) {
+//            UIImage *image = [self imageFromSampleBuffer:sampleBuffer];
+//            NSString *path = [self.hlsWriter.directoryPath stringByAppendingPathComponent:@"thumb.jpg"];
+//            NSData *imageData = UIImageJPEGRepresentation(image, 0.7);
+//            [imageData writeToFile:path atomically:NO];
+//            _hasScreenshot = YES;
+//        }
+//        [_h264Encoder encodeSampleBuffer:sampleBuffer];
+//    } else if (connection == _audioConnection) {
+//        [_aacEncoder encodeSampleBuffer:sampleBuffer];
+//    }
+//}
 
 // Create a UIImage from sample buffer data
 - (UIImage *) imageFromSampleBuffer:(CMSampleBufferRef) sampleBuffer
@@ -200,50 +195,37 @@
     _session = [[AVCaptureSession alloc] init];
     [self setupVideoCapture];
     [self setupAudioCapture];
-
+    
     // start capture and a preview layer
     [_session startRunning];
-
+    
     _previewLayer = [AVCaptureVideoPreviewLayer layerWithSession:_session];
     _previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
 }
 
 - (void) startRecording {
-    self.locationManager = [[CLLocationManager alloc] init];
-    self.locationManager.delegate = self;
-    [self.locationManager startUpdatingLocation];
-    [[KFAPIClient sharedClient] startNewStream:^(KFStream *endpointResponse, NSError *error) {
-        if (error) {
-            if (self.delegate && [self.delegate respondsToSelector:@selector(recorderDidStartRecording:error:)]) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self.delegate recorderDidStartRecording:self error:error];
-                });
-            }
-            return;
-        }
-        self.stream = endpointResponse;
-        [self setStreamStartLocation];
-        if ([endpointResponse isKindOfClass:[KFS3Stream class]]) {
-            KFS3Stream *s3Endpoint = (KFS3Stream*)endpointResponse;
-            s3Endpoint.streamState = KFStreamStateStreaming;
-            [self setupHLSWriterWithEndpoint:s3Endpoint];
-            
-            [[KFHLSMonitor sharedMonitor] startMonitoringFolderPath:_hlsWriter.directoryPath endpoint:s3Endpoint delegate:self];
-            
-            NSError *error = nil;
-            [_hlsWriter prepareForWriting:&error];
-            if (error) {
-                DDLogError(@"Error preparing for writing: %@", error);
-            }
-            self.isRecording = YES;
-            if (self.delegate && [self.delegate respondsToSelector:@selector(recorderDidStartRecording:error:)]) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self.delegate recorderDidStartRecording:self error:nil];
-                });
-            }
-        }
-    }];
+    //    self.locationManager = [[CLLocationManager alloc] init];
+    //    self.locationManager.delegate = self;
+    //    [self.locationManager startUpdatingLocation];
+    KFStream *endpoint = [[KFStream alloc] init ];
+    NSError *error;
+    endpoint.username = @"HLS Recorder";
+    self.stream = endpoint;
+    KFS3Stream *s3Endpoint = (KFS3Stream*)endpoint;
+    s3Endpoint.streamState = KFStreamStateStreaming;
+    [self setupHLSWriterWithEndpoint:self.endpointString];
     
+    [[KFHLSMonitor sharedMonitor] startMonitoringFolderPath:_hlsWriter.directoryPath endpoint:s3Endpoint delegate:self];
+    [_hlsWriter prepareForWriting:&error];
+    if (error) {
+        DDLogError(@"Error preparing for writing: %@", error);
+    }
+    self.isRecording = YES;
+    if (self.delegate && [self.delegate respondsToSelector:@selector(recorderDidStartRecording:error:)]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.delegate recorderDidStartRecording:self error:nil];
+        });
+    }
 }
 
 - (void) reverseGeocodeStream:(KFStream*)stream {
@@ -280,16 +262,31 @@
     }];
 }
 
+- (void) didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(RPSampleBufferType)type
+API_AVAILABLE(ios(10.0)){
+    if (!_isRecording) {
+        return;
+    }
+    // pass frame to encoders
+    if (type == RPSampleBufferTypeVideo) {
+        if (!_hasScreenshot) {
+            UIImage *image = [self imageFromSampleBuffer:sampleBuffer];
+            NSString *path = [self.hlsWriter.directoryPath stringByAppendingPathComponent:@"thumb.jpg"];
+            NSData *imageData = UIImageJPEGRepresentation(image, 0.7);
+            [imageData writeToFile:path atomically:NO];
+            _hasScreenshot = YES;
+        }
+        [_h264Encoder encodeSampleBuffer:sampleBuffer];
+    } else if (type == RPSampleBufferTypeAudioApp || type == RPSampleBufferTypeAudioMic) {
+        [_aacEncoder encodeSampleBuffer:sampleBuffer];
+    }
+}
+
 - (void) stopRecording {
     [self.locationManager stopUpdatingLocation];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         if (self.lastLocation) {
             self.stream.endLocation = self.lastLocation;
-            [[KFAPIClient sharedClient] updateMetadataForStream:self.stream callbackBlock:^(KFStream *updatedStream, NSError *error) {
-                if (error) {
-                    DDLogError(@"Error updating stream endLocation: %@", error);
-                }
-            }];
         }
         [_session stopRunning];
         self.isRecording = NO;
@@ -302,7 +299,7 @@
             if (!success) {
                 DDLogError(@"Error stopping stream: %@", error);
             } else {
-                DDLogVerbose(@"Stream stopped: %@", self.stream.streamID);
+                NSLog(@"Stream stopped: %@", self.stream.streamID);
             }
         }];
         if ([self.stream isKindOfClass:[KFS3Stream class]]) {
@@ -317,11 +314,11 @@
 }
 
 - (void) uploader:(KFHLSUploader *)uploader didUploadSegmentAtURL:(NSURL *)segmentURL uploadSpeed:(double)uploadSpeed numberOfQueuedSegments:(NSUInteger)numberOfQueuedSegments {
-    DDLogInfo(@"Uploaded segment %@ @ %f KB/s, numberOfQueuedSegments %d", segmentURL, uploadSpeed, numberOfQueuedSegments);
+    DDLogInfo(@"Uploaded segment %@ @ %f KB/s, numberOfQueuedSegments %lu", segmentURL, uploadSpeed, (unsigned long)numberOfQueuedSegments);
     if ([Kickflip useAdaptiveBitrate]) {
         double currentUploadBitrate = uploadSpeed * 8 * 1024; // bps
         double maxBitrate = [Kickflip maxBitrate];
-
+        
         double newBitrate = currentUploadBitrate * 0.5;
         if (newBitrate > maxBitrate) {
             newBitrate = maxBitrate;
@@ -340,7 +337,7 @@
             [self.delegate recorder:self streamReadyAtURL:manifestURL];
         });
     }
-    DDLogVerbose(@"Manifest ready at URL: %@", manifestURL);
+    NSLog(@"Manifest ready at URL: %@", manifestURL);
 }
 
 - (void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
@@ -362,5 +359,4 @@
         [self reverseGeocodeStream:self.stream];
     }
 }
-
 @end

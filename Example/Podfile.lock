@@ -72,6 +72,26 @@ DEPENDENCIES:
   - VTAcknowledgementsViewController (~> 0.10)
   - YapDatabase (~> 2.6)
 
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - AFNetworking
+    - AFOAuth2Manager
+    - AWSCore
+    - AWSS3
+    - BButton
+    - CocoaLumberjack
+    - FFmpeg
+    - FFmpegWrapper
+    - FormatterKit
+    - Mantle
+    - PureLayout
+    - SDWebImage
+    - SSKeychain
+    - SSPullToRefresh
+    - UIAlertView-Blocks
+    - VTAcknowledgementsViewController
+    - YapDatabase
+
 EXTERNAL SOURCES:
   Kickflip:
     :path: "../Kickflip.podspec"
@@ -83,7 +103,7 @@ SPEC CHECKSUMS:
   AWSS3: 9ac201e7a4ad8be0b68348c77acfd100027b97af
   BButton: ab0f2ed3b998ae73c5188b57d270d81e4a1eeb27
   CocoaLumberjack: 628fca2e88ef06f7cf6817309aa405f325d9a6fa
-  FFmpeg: e004e90bdac48219b272e7bea11671a25bb0a9b9
+  FFmpeg: 9eceaf0ea988434e1aeb31e3ee82d066d79bcdf4
   FFmpegWrapper: 9a932581137d17203e842ce942e171158336ae16
   FormatterKit: bddde83e054edf9d9ee14f9de3b3a5103db256f4
   Kickflip: 18b5cbec453592576185efe570e228eee7190387
@@ -96,4 +116,6 @@ SPEC CHECKSUMS:
   VTAcknowledgementsViewController: 6056f5f5e5ed995bbf0581bed6ddd29355ca9a80
   YapDatabase: 814f9ff862a95c1e581d93335a4020482b69155b
 
-COCOAPODS: 0.39.0
+PODFILE CHECKSUM: 8d7d0f428fb35067d053ed1ebc442f32ecaee368
+
+COCOAPODS: 1.6.1

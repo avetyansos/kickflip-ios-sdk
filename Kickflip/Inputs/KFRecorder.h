@@ -12,6 +12,7 @@
 #import "KFH264Encoder.h"
 #import "KFHLSUploader.h"
 #import <CoreLocation/CoreLocation.h>
+#import <ReplayKit/ReplayKit.h>
 
 @class KFRecorder, KFHLSWriter, KFStream;
 
@@ -46,9 +47,10 @@
 @property (nonatomic) NSUInteger audioSampleRate;
 
 @property (nonatomic) BOOL isRecording;
-
+- (void) didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(RPSampleBufferType)type
+API_AVAILABLE(ios(10.0));
 @property (nonatomic, weak) id<KFRecorderDelegate> delegate;
-
+- (id) init:(NSString*)endPoint;
 - (void) startRecording;
 - (void) stopRecording;
 
